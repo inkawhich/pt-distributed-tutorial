@@ -72,7 +72,7 @@ def main():
     
     # Url used to setup distributed training
     # v1
-    dist_url = "tcp://127.0.0.1:23456"
+    dist_url = "tcp://18.205.21.252:23456"
     # v2
     #dist_url = "file:///home/ubuntu/distributed_tutorial/trainfile"
 
@@ -105,11 +105,11 @@ def main():
     """
     print("Initialize Process Group...") 
     # v1 - init with url
-    #dist.init_process_group(backend=dist_backend, init_method=dist_url, rank=int(sys.argv[1]), world_size=world_size)
+    dist.init_process_group(backend=dist_backend, init_method=dist_url, rank=int(sys.argv[1]), world_size=world_size)
     # v2 - init with file
-    dist.init_process_group(backend="nccl", init_method="file:///home/ubuntu/distributed_tutorial/trainfile", rank=int(sys.argv[1]), world_size=world_size)
+    #dist.init_process_group(backend="nccl", init_method="file:///home/ubuntu/pt-distributed-tutorial/trainfile", rank=int(sys.argv[1]), world_size=world_size)
     
-    local_rank = int(sys.argv[1])
+    local_rank = int(sys.argv[2])
     dp_device_ids = [local_rank]
     torch.cuda.set_device(local_rank)
 

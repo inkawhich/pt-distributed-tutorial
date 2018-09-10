@@ -68,11 +68,14 @@ def main():
     world_size = 2 
     
     # Distributed backend type
-    dist_backend = 'nccl'
+    #dist_backend = 'nccl'
+    dist_backend = 'gloo'
     
     # Url used to setup distributed training
     # v1
-    dist_url = "tcp://18.205.21.252:23456"
+    #dist_url = "tcp://18.205.21.252:23456"
+    dist_url = "tcp://172.31.22.234:23456"
+    #dist_url = "tcp://172.17.0.1:23456"
     # v2
     #dist_url = "file:///home/ubuntu/distributed_tutorial/trainfile"
 
@@ -133,7 +136,8 @@ def main():
 
     print("Initialize Model...")
     model = models.resnet18(pretrained=False).cuda()
-    model = torch.nn.parallel.DistributedDataParallel(model, device_ids=dp_device_ids)
+    #model = torch.nn.parallel.DistributedDataParallel(model, device_ids=dp_device_ids)
+    model = torch.nn.parallel.DistributedDataParallel(model, device_ids=dp_device_ids, output_device=local_rank)
     
     # define loss function (criterion) and optimizer
     criterion = nn.CrossEntropyLoss().cuda()

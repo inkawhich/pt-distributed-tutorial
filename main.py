@@ -11,6 +11,7 @@ import torch.nn as nn
 import torch.nn.parallel
 import torch.backends.cudnn as cudnn
 import torch.distributed as dist
+#import torch.distributed.c10d as dist
 import torch.optim
 import torch.utils.data
 import torch.utils.data.distributed
@@ -53,10 +54,10 @@ def main():
     print("Collect Inputs...")
 
     # Batch Size for training and testing
-    batch_size = 64
+    batch_size = 32
 
     # Number of worker threads for dataloading
-    workers = 4
+    workers = 2
 
     # Number of epochs to train for
     num_epochs = 2
@@ -65,11 +66,11 @@ def main():
     starting_lr = 0.1
 
     # Number of distributed processes
-    world_size = 2 
+    world_size = 4 
     
     # Distributed backend type
-    #dist_backend = 'nccl'
-    dist_backend = 'gloo'
+    dist_backend = 'nccl'
+    #dist_backend = 'gloo'
     
     # Url used to setup distributed training
     # v1
@@ -136,8 +137,8 @@ def main():
 
     print("Initialize Model...")
     model = models.resnet18(pretrained=False).cuda()
-    #model = torch.nn.parallel.DistributedDataParallel(model, device_ids=dp_device_ids)
     model = torch.nn.parallel.DistributedDataParallel(model, device_ids=dp_device_ids, output_device=local_rank)
+    #model = torch.nn.parallel.DistributedDataParallelC10D(model, device_ids=dp_device_ids, output_device=local_rank)
     
     # define loss function (criterion) and optimizer
     criterion = nn.CrossEntropyLoss().cuda()
@@ -257,7 +258,7 @@ def train(train_loader, model, criterion, optimizer, epoch):
         loss.backward()
 
         # Average gradients across all workers 
-        average_gradients(model)
+        #average_gradients(model)
 
         # Call step of optimizer to update model params
         optimizer.step()

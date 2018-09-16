@@ -18,7 +18,12 @@ import torch.utils.data.distributed
 import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 import torchvision.models as models
-
+# Avoid deadlock
+from torch.multiprocessing import Pool, Process, set_start_method
+try:
+    set_start_method('spawn')
+except RuntimeError:
+    pass
 
 #########################################################################3
 # MAIN
@@ -198,7 +203,6 @@ def main():
     best_prec1 = 0
 
     for epoch in range(num_epochs):
-        
         train_sampler.set_epoch(epoch)
         adjust_learning_rate(starting_lr, optimizer, epoch)
 
@@ -277,6 +281,8 @@ def train(train_loader, model, criterion, optimizer, epoch):
                    epoch, i, len(train_loader), batch_time=batch_time,
                    data_time=data_time, loss=losses, top1=top1, top5=top5))
 
+       
+"""
 #########################################################################3
 # Average Gradients Fxn
 #########################################################################3
@@ -286,7 +292,7 @@ def average_gradients(model):
         dist.all_reduce(param.grad.data, op=dist.reduce_op.SUM)
         # TODO dist.all_reduce_multigpu(param.grad.data, op=dist.reduce_op.SUM)
         param.grad.data /= size
-
+"""
 
 #########################################################################3
 # Validate Fxn
